@@ -10,13 +10,11 @@ const { findBy } = require('../users/users-model')
   }
 */
 function restricted(req, res, next) {
-  console.log('restricted')
-  next()
-  // if (req.session.user) {
-  //   next();
-  // } else {
-  //   next({ status: 401, message: 'You shall not pass!'})
-  // }
+  if(req.session.user) {
+    next()
+  } else {
+    next({ status: 401, message: 'You shall not pass!'})
+  }
 }
 
 /*
@@ -52,6 +50,7 @@ async function checkUsernameExists(req, res, next) {
   try {
     const existingUsers = await findBy({ username: req.body.username })
     if(existingUsers.length) {
+      req.user = existingUsers[0]
       next()
     } else {
       next({ status: 401, message: 'Invalid credentials' })

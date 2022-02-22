@@ -82,7 +82,7 @@ router.get('/logout', async (req, res, next) => {
       }
     })
   } else {
-    res.json({ message: 'Invalid credentials'})
+    res.json({ message: 'no session'})
   }
 })
 

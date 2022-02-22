@@ -5,7 +5,7 @@ const { checkUsernameFree, checkUsernameExists, checkPasswordLength } = require(
 const bcrypt = require('bcryptjs')
 const { add, findBy } = require('../users/users-model')
 
-router.post('/register', checkUsernameFree, checkPasswordLength, async (req, res, next) => {
+router.post('/register', checkPasswordLength, checkUsernameFree, async (req, res, next) => {
   try {
     const { username, password } = req.body
     const hash = bcrypt.hashSync(password, 9)
@@ -71,6 +71,20 @@ router.post('/login', checkUsernameExists, async (req, res, next) => {
   }
  */
 
+
+router.get('/logout', async (req, res, next) => {
+  if(req.session.user) {
+    req.session.destroy(err => {
+      if(err) {
+        res.status(200).json({ message: 'no session'})
+      } else {
+        res.status(200).json({ message: 'logged out'})
+      }
+    })
+  } else {
+    res.json({ message: 'Invalid credentials'})
+  }
+})
 
 /**
   3 [GET] /api/auth/logout

@@ -1,3 +1,6 @@
+const dbConfig = require('../../data/db-config');
+const { findBy } = require('../users/users-model')
+
 /*
   If the user does not have a session saved in the server
 
@@ -7,11 +10,13 @@
   }
 */
 function restricted(req, res, next) {
-  if (req.session.user) {
-    next();
-  } else {
-    next({ status: 401, message: 'You shall not pass!'})
-  }
+  console.log('restricted')
+  next()
+  // if (req.session.user) {
+  //   next();
+  // } else {
+  //   next({ status: 401, message: 'You shall not pass!'})
+  // }
 }
 
 /*
@@ -22,11 +27,16 @@ function restricted(req, res, next) {
     "message": "Username taken"
   }
 */
-function checkUsernameFree(req, res, next) {
-  if (!req.body.username) {
-    next();
-  } else {
-    next({ status: 422, message: 'Username taken'})
+async function checkUsernameFree(req, res, next) {
+  try {
+    const existingUsers = await findBy({ username: req.body.username})
+    if (!existingUsers.length) {
+      next();
+    } else {
+      next({ status: 422, message: 'Username taken'})
+    }
+  } catch (err) {
+    next(err)
   }
 }
 
@@ -38,11 +48,16 @@ function checkUsernameFree(req, res, next) {
     "message": "Invalid credentials"
   }
 */
-function checkUsernameExists(req, res, next) {
-  if(req.body.username) {
-    next();
-  } else {
-    next({ status: 401, message: 'Invalid credentials'})
+async function checkUsernameExists(req, res, next) {
+  try {
+    const existingUsers = await findBy({ username: req.body.username })
+    if(existingUsers.length) {
+      next()
+    } else {
+      next({ status: 401, message: 'Invalid credentials' })
+    }
+  } catch(err) {
+    next(err)
   }
 }
 
@@ -55,7 +70,7 @@ function checkUsernameExists(req, res, next) {
   }
 */
 function checkPasswordLength(req, res, next) {
-  if(req.body.password.lenth > 3) {
+  if(req.body.password.length > 3) {
     next();
   } else {
     next({ status: 422, message: 'Password must be longer than 3 chars'})

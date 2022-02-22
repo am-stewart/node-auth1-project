@@ -8,9 +8,8 @@ router.get('/', restricted, (req, res, next) => {
   Users.find()
     .then(users => {
       res.status(200).json(users)
-    }) .catch(err) {
-      next({ status: 401, message: 'You shall not pass!'})
-    }
+    }) .catch(
+      next({ status: 401, message: 'You shall not pass!'}))
 })
 
 /**
